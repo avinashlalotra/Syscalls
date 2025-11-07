@@ -1,4 +1,5 @@
 # Custom Linux Syscall — my_pid()
+Link: https://avinashlalotra.github.io/#/posts/syscalls
 
 This project demonstrates how to implement a **custom Linux system call** named `my_pid()` for educational purposes.  
 The syscall returns the PID of the process invoking it.
