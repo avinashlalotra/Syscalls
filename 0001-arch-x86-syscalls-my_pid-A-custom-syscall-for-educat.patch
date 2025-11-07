@@ -1,0 +1,80 @@
+From 2d128f3ea5cb1d3ce3e60c761f11c2c0ad7d4be5 Mon Sep 17 00:00:00 2001
+From: Abinash Singh <abinashsinghlalotra@gmail.com>
+Date: Thu, 6 Nov 2025 21:44:27 +0530
+Subject: [PATCH] arch/x86/syscalls: my_pid: A custom syscall for educational
+ purposes
+
+This is for educational purposes only. Adding new syscalls is
+not prefered and ioctl() can be used for new features.
+
+This will add a new syscall `my_pid` with number 470 and
+is available on both x86_32 and x86_64
+
+Links: https://avinashlalotra.github.io/#/posts/syscalls
+Signed-off-by: Abinash Singh <abinashsinghlalotra@gmail.com>
+---
+ arch/x86/entry/syscalls/syscall_32.tbl |  1 +
+ arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+ arch/x86/kernel/Makefile               |  3 +++
+ arch/x86/kernel/new_syscall.c          | 15 +++++++++++++++
+ 4 files changed, 20 insertions(+)
+ create mode 100644 arch/x86/kernel/new_syscall.c
+
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index 4877e16da69a..bf32de1e3fbf 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -475,3 +475,4 @@
+ 467	i386	open_tree_attr		sys_open_tree_attr
+ 468	i386	file_getattr		sys_file_getattr
+ 469	i386	file_setattr		sys_file_setattr
++470 i386    my_pid              sys_my_pid
+\ No newline at end of file
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index ced2a1deecd7..bf8c25c52b8f 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -394,6 +394,7 @@
+ 467	common	open_tree_attr		sys_open_tree_attr
+ 468	common	file_getattr		sys_file_getattr
+ 469	common	file_setattr		sys_file_setattr
++470 common  my_pid              sys_my_pid
+ 
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index bc184dd38d99..07e666197605 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -166,3 +166,6 @@ ifeq ($(CONFIG_X86_64),y)
+ 	obj-$(CONFIG_MMCONF_FAM10H)	+= mmconf-fam10h_64.o
+ 	obj-y				+= vsmp_64.o
+ endif
++
++# Our new syscall
++obj-y   +=new_syscall.o
+\ No newline at end of file
+diff --git a/arch/x86/kernel/new_syscall.c b/arch/x86/kernel/new_syscall.c
+new file mode 100644
+index 000000000000..54b18066a9d9
+--- /dev/null
++++ b/arch/x86/kernel/new_syscall.c
+@@ -0,0 +1,15 @@
++#include<linux/kernel.h>
++#include<linux/syscalls.h>
++#include<asm/current.h>
++
++// Use this without wrapper (disable the syscall wrapper support)
++// asmlinkage long sys_my_pid(void){
++//     return task_tgid_vnr(current);
++// };
++
++
++//  Using the macro
++SYSCALL_DEFINE0(my_pid){
++    return task_tgid_vnr(current);
++};
++
+-- 
+2.43.0
+
